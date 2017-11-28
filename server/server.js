@@ -1,3 +1,14 @@
+const env = process.env.NODE_ENV || 'development';
+console.log(`******************** env is ${env}`)
+if (env === 'development') {
+  process.env.PORT = 3000;
+  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoApp';
+} else if (env === 'test') {
+  process.env.PORT = 3000;
+  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
+}
+
+
 const _ = require('lodash');
 const {
   ObjectID
@@ -116,8 +127,8 @@ app.patch('/todos/:id', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('app is listening on ', 3000);
+app.listen(process.env.PORT, () => {
+  console.log('app is listening on ', process.env.PORT);
 });
 
 module.exports = {

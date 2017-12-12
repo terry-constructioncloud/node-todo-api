@@ -13,7 +13,7 @@ const newTodo = new Todo({
 });
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const {authenticate} = require('./middleware/authenticate');
 const app = express();
 
 app.use(bodyParser.json());
@@ -115,7 +115,7 @@ app.patch('/todos/:id', (req, res) => {
     });
 });
 
-app.post('/users/' , (req, res) => {
+app.post('/users/', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
     const user = new User(body);
     user.save().then(() => {
@@ -125,6 +125,11 @@ app.post('/users/' , (req, res) => {
     }).catch(e => {
         res.status(400).send(e);
     });
+});
+
+
+app.get('/users/me', authenticate, async (req, res) => {
+    res.send(req.user);
 });
 
 app.listen(process.env.PORT, () => {

@@ -239,8 +239,8 @@ describe('POST /users', () => {
 
 describe('POST /uses/login', () => {
     it('should login user and return auth token', done => {
-        const email = users[0].email;
-        const password = users[0].password;
+        const email = users[1].email;
+        const password = users[1].password;
         request(app).post('/users/login')
             .send({
                 email, password
@@ -253,11 +253,30 @@ describe('POST /uses/login', () => {
                 return done(err);
             }
 
-            User.findById(users[0]._id).then(user => {
-                expect(user.tokens[1].token).toBe(res.headers['x-auth']);
+            User.findById(users[1]._id).then(user => {
+                expect(user.tokens[0].token).toBe(res.headers['x-auth']);
                 done();
             }).catch(e => done(e));
         });
     });
 
+    it('should not login with wrong email/password', done => {
+        const email = users[1].email;
+        const password = users[1].password + '123';
+        request(app).post('/users/login')
+            .send({email, password})
+            .expect(400)
+            .expect(res => {
+                expect(res.headers['x-auth']).toBeFalsy();
+            }).end((err, res) => {
+            if (err) {
+                return done(err);
+            }
+
+            User.findById(users[1]._id).then(user => {
+                expect(user.tokens.length).toBe(0);
+                done();
+            }).catch(e => done(e));
+        });
+    });
 });

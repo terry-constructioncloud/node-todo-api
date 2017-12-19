@@ -214,7 +214,7 @@ describe('POST /users', () => {
                 expect(user).toBeDefined();
                 expect(user.password).not.toBe(password);
                 done();
-            });
+            }).catch(e => done(e));
         });
     });
 
@@ -235,4 +235,29 @@ describe('POST /users', () => {
             .expect(400)
             .end(done);
     });
+});
+
+describe('POST /uses/login', () => {
+    it('should login user and return auth token', done => {
+        const email = users[0].email;
+        const password = users[0].password;
+        request(app).post('/users/login')
+            .send({
+                email, password
+            })
+            .expect(200)
+            .expect(res => {
+                expect(res.headers['x-auth']).toBeTruthy();
+            }).end((err, res) => {
+            if (err) {
+                return done(err);
+            }
+
+            User.findById(users[0]._id).then(user => {
+                expect(user.tokens[1].token).toBe(res.headers['x-auth']);
+                done();
+            }).catch(e => done(e));
+        });
+    });
+
 });

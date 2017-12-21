@@ -137,6 +137,13 @@ app.post('/users/login', (req, res) => {
         res.sendStatus(400);
     });
 });
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }).catch(() => {
+        res.status(400).send();
+    });
+});
 
 app.get('/users/me', authenticate, async (req, res) => {
     res.send(req.user);
@@ -149,17 +156,3 @@ app.listen(process.env.PORT, () => {
 module.exports = {
     app
 };
-// newTodo.save().then((doc) => {
-//   console.log('saved', doc);
-// }).catch(e => {
-//   console.error('cannot save', e);
-// });
-
-
-// new User({
-//   email: 'foo@bar.com'
-// }).save().then(() => {
-//   console.log('user saved');
-// }).catch(err => {
-//   console.error(err);
-// });

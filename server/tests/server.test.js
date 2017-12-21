@@ -280,3 +280,33 @@ describe('POST /uses/login', () => {
         });
     });
 });
+
+
+describe('DELETE /users/me/token', () => {
+    it('should logout', done => {
+        request(app).delete('/users/me/token')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(users[0]._id).then(user => {
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch(e => done(e));
+            });
+    });
+
+    it('should not do anything when no token given in the header', done => {
+        request(app).delete('/users/me/token')
+            .expect(401)
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                done();
+            });
+    });
+});
